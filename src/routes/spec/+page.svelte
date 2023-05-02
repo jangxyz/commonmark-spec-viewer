@@ -75,7 +75,7 @@
 	 * @returns {HastNodes}
 	 */
 	function normalizeHast(hast) {
-		injectHorizontalRule(hast);
+		injectHorizontalRule(hast, 'h1');
 
 		hast = numberHeading(hast, {
 			exclude: ['Appendix: A parsing strategy']
@@ -136,8 +136,6 @@
 					Estimated reading time: {readingTime(hast).toFixed(1)} minutes.
 				</p>
 			</div>
-
-			<hr />
 		</details>
 
 		{@html html}
