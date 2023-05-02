@@ -10,20 +10,53 @@ type HastNodes = HastRoot | HastContent;
 
 type HastHeadingGroup = [HastElement, ...HastContent[]];
 
-type ResultTuple = [HastHeadingGroup, ResultTuple[]];
+function isHeadingGroup(nodes: HastContent[]): nodes is HastHeadingGroup {
+	return heading(nodes[0]);
+}
 
 export default function selectHeadingSectionElements(
 	hast: HastNodes,
 	groupFilter?: (group: HastHeadingGroup, index: number, entire: HastHeadingGroup[]) => boolean
 ): [HastHeadingGroup[], HastParent] {
-	const headingGroupsResult = getHeadingGroups(hast);
-	if (!headingGroupsResult) return;
-	if (!groupFilter) return headingGroupsResult;
+	const contentParent = findFirstHeadingsParent(hast);
+	if (!contentParent) return; // cannot find any headings
 
-	const [headingGroups, parent] = headingGroupsResult;
-	const filteredGroups = headingGroups.filter(groupFilter);
+	const headingGroups = splitByHeadings(contentParent);
+	// no filter, return every groups.
+	if (!groupFilter) return [headingGroups, contentParent];
 
-	return [filteredGroups, parent];
+	// collect groups
+	const collectResult = headingGroups
+		.reduce((memo, group, index, entire) => {
+			const lastMatch = memo.at(-1);
+
+			const didMatch = groupFilter(group, index, entire);
+			// add new match
+			if (didMatch) {
+				memo.push({
+					group,
+					rank: headingRank(group[0])
+				});
+			} else if (lastMatch) {
+				// has last match. see if it should be contiguous
+				const rank = headingRank(group[0]);
+				const isLowerRank = rank > lastMatch.rank;
+				//console.log('has last match', isLowerRank, group, { rank, lastMatch, memo: structuredClone(memo) });
+				// concat to last match
+				if (isLowerRank) {
+					lastMatch.group = lastMatch.group.concat(group) as HastHeadingGroup;
+				}
+				// clear last match
+				else {
+					memo.push(undefined);
+				}
+			}
+			return memo;
+		}, [] as { group: HastHeadingGroup; rank: number }[])
+		.filter(Boolean);
+	const filteredGroups = collectResult.map(({ group }) => group);
+
+	return [filteredGroups, contentParent];
 }
 
 function getHeadingGroups(hast: HastNodes): [HastHeadingGroup[], HastParent] | undefined {
@@ -45,7 +78,7 @@ function findFirstHeadingsParent(hast: HastNodes): HastParent | undefined {
 }
 
 function splitByHeadings(contentParent: HastParent): HastHeadingGroup[] {
-	return contentParent.children
+	const headingGroups = contentParent.children
 		.reduce(
 			(memo, node) => {
 				// add new group
@@ -61,8 +94,18 @@ function splitByHeadings(contentParent: HastParent): HastHeadingGroup[] {
 			[[]] as HastContent[][]
 		)
 		.filter((group) => group.length > 0);
+
+	// check type
+	if (!headingGroups.some(isHeadingGroup)) {
+		throw new Error('first element is not a heading eleement');
+	}
+
+	return headingGroups as HastHeadingGroup[];
 }
 
+//
+
+type ResultTuple = [HastHeadingGroup, ResultTuple[]];
 function getNestedGroupMap(hast: HastNodes): ResultTuple[] {
 	// find first heading elements' parent.
 	const contentParent = findFirstHeadingsParent(hast);
