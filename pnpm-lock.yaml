@@ -13,6 +13,9 @@ dependencies:
   hast-util-to-html:
     specifier: ^8.0.4
     version: 8.0.4
+  hast-util-to-string:
+    specifier: ^2.0.0
+    version: 2.0.0
   mdast-builder:
     specifier: ^1.1.1
     version: 1.1.1
@@ -49,6 +52,9 @@ dependencies:
   unist-util-filter:
     specifier: ^4.0.1
     version: 4.0.1
+  unist-util-is:
+    specifier: ^5.2.1
+    version: 5.2.1
   unist-util-remove-position:
     specifier: ^4.0.2
     version: 4.0.2
@@ -1359,6 +1365,12 @@ packages:
       space-separated-tokens: 2.0.2
       web-namespaces: 2.0.1
       zwitch: 2.0.4
+    dev: false
+
+  /hast-util-to-string@2.0.0:
+    resolution: {integrity: sha512-02AQ3vLhuH3FisaMM+i/9sm4OXGSq1UhOOCpTLLQtHdL3tZt7qil69r8M8iDkZYyC0HCFylcYoP+8IO7ddta1A==}
+    dependencies:
+      '@types/hast': 2.3.4
     dev: false
 
   /hast-util-whitespace@2.0.1:
