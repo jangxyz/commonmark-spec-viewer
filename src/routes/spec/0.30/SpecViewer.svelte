@@ -12,19 +12,20 @@
 	import rehypeSlug from 'rehype-slug';
 	import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
-	import numberHeading from '../../lib/hast/hast_util_number_heading';
-	import selectHeadingSectionElements from '../../lib/hast/hast_select_heading_section_elements';
+	import numberHeading from '$lib/hast/hast_util_number_heading';
+	import selectHeadingSectionElements from '$lib/hast/hast_select_heading_section_elements';
 	import Toc from './Toc.svelte';
 	import Header from './Header.svelte';
-	import injectHorizontalRule from '../../lib/hast/hast_inject_horizontal_rule';
+	import injectHorizontalRule from '$lib/hast/hast_inject_horizontal_rule';
 	import numberExampleCodes from '$lib/hast/hast_util_number_example_codes';
 
 	import './article.css';
 
 	/**
-	 * @typedef {import('../../lib/types').HastNodes} HastNodes
-	 * @typedef {import('../../lib/types').HastRoot} HastRoot
-	 * @typedef {import('../../lib/types').MdastRoot} MdastRoot
+	 * @typedef {import('$lib/types').HastNodes} HastNodes
+	 * @typedef {import('$lib/types').HastRoot} HastRoot
+	 * @typedef {import('$lib/types').MdastRoot} MdastRoot
+	 * @typedef {import('$lib/types').MdastNode} MdastNode
 	 */
 
 	export let urlHash;
@@ -32,7 +33,7 @@
 
 	/** @type {MdastRoot} */
 	let mdast;
-	/** @type {import('../../lib/types').MdastNode} */
+	/** @type {MdastNode} */
 	let mdast2;
 	let matter;
 
