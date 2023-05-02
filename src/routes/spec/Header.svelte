@@ -8,10 +8,10 @@
 		<span class="title">CommonMark Spec</span>
 	</div>
 	<div class="right">
-		<label>
+		<label title="Show table of contents sidebar">
 			<input type="checkbox" bind:checked={showToc} /> ToC
 		</label>
-		<label>
+		<label title="Show only contents of selected section">
 			<input type="checkbox" bind:checked={showOnlySelected} /> Only selected
 		</label>
 	</div>

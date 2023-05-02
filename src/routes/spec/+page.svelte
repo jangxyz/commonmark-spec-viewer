@@ -132,7 +132,7 @@
 	 * @returns {HastNodes}
 	 */
 	function refineHast(hast, urlHash, showOnlySelected) {
-		console.log('refineHast', hast, { urlHash, showOnlySelected });
+		//console.log('refineHast', hast, { urlHash, showOnlySelected });
 		if (!(urlHash && showOnlySelected)) return hast;
 
 		const hast2 = structuredClone(hast);
@@ -145,7 +145,7 @@
 			parent.children = groups[0];
 		}
 
-		console.log('🚀 ~ file: +page.svelte:129 ~ refineHast ~ hast2:', hast2);
+		//console.log('🚀 ~ file: +page.svelte:129 ~ refineHast ~ hast2:', hast2);
 		return hast2;
 	}
 
@@ -177,7 +177,7 @@
 				{/if}
 
 				<p>
-					Estimated reading time: {readingTime(hast).toFixed(1)} minutes.
+					Estimated reading time: {readingTime(hast2).toFixed(1)} minutes
 				</p>
 			</div>
 		</details>

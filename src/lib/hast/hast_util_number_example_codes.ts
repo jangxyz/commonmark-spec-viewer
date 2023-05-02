@@ -76,8 +76,22 @@ export default function numberExampleCodes(hast: HastNodes): HastNodes {
 		codeEl.children = [{ type: 'text', value: text1 }];
 
 		// wrap with fig
-		const wrapper = h(`figure#example-${exNumber}.example-code`, [
-			h('figcaption', [h('a', {}, `Example ${exNumber}`)]),
+		const idAttr = `example-${exNumber}`;
+		const dingusLink = h(
+			'a.dingus',
+			{
+				href: `https://spec.commonmark.org/dingus/?text=${encodeURIComponent(text1)}`,
+				title: 'open in interactive dingus',
+				target: '_blank',
+				rel: 'noopener noreferer'
+			},
+			'Try It'
+		);
+		const wrapper = h(`figure#${idAttr}.example-code`, [
+			h('figcaption', [
+				h('span.title', [h('a', { href: `#${idAttr}` }, `Example ${exNumber}`)]),
+				dingusLink
+			]),
 			h('div.columns', [
 				h('div.column.left', [preEl]),
 				h('div.column.right', [h('pre', h('code', [{ type: 'text', value: text2 }]))])

@@ -10,6 +10,19 @@ pre > code {
   background-color: transparent;
 }
 
+figure.example-code figcaption {
+  position: relative;
+}
+figure.example-code figcaption .title {
+  display: inline-block;
+  width: 50%;
+}
+figure.example-code figcaption a.dingus {
+  position: absolute;
+  transform: translateX(-100%);
+  margin-left: -8px;
+}
+
 figure.example-code .columns {
   display: flex;
   flex-direction: row;
