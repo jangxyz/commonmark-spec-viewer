@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 
 	import { fromMarkdown } from 'mdast-util-from-markdown';
@@ -8,6 +9,7 @@
 	import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
 	import { frontmatter } from 'micromark-extension-frontmatter';
 	import { readingTime } from 'hast-util-reading-time';
+	import { raw } from 'hast-util-raw';
 	import rehypeSlug from 'rehype-slug';
 	import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
@@ -16,18 +18,26 @@
 	import Toc from './Toc.svelte';
 	import Header from './Header.svelte';
 	import injectHorizontalRule from '../../lib/hast/hast_inject_horizontal_rule';
+	import numberExampleCodes from '$lib/hast/hast_util_number_example_codes';
 
+	import './article.css';
+
+	let searchParams = $page.url.searchParams;
+	let urlHash = $page.url.hash;
+	$: searchParams = $page.url.searchParams;
 	$: urlHash = $page.url.hash;
 
 	/**
 	 * @typedef {import('../../lib/types').HastNodes} HastNodes
+	 * @typedef {import('../../lib/types').HastRoot} HastRoot
+	 * @typedef {import('../../lib/types').MdastRoot} MdastRoot
 	 */
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 	$: ({ spec } = data);
 
-	/** @type {import('../../lib/types').MdastRoot} */
+	/** @type {MdastRoot} */
 	let mdast;
 	/** @type {import('../../lib/types').MdastNode} */
 	let mdast2;
@@ -35,6 +45,8 @@
 
 	/** @type {HastNodes} */
 	let hast;
+	/** @type {HastNodes} */
+	let hast2; // refined
 
 	/** @type {string} */
 	let html = '';
@@ -43,31 +55,47 @@
 
 	let showToc = true;
 	$: sidebarWidth = showToc ? 200 : 0;
-	let showOnlySelected = false;
+	let showOnlySelected = searchParams?.get('show-only-selected') === '1'; // false;
 
 	// render markdown
 	$: (async (spec) => {
-		// mdast
+		// markdown -> mdast
+		mdast = parseMarkdown(spec);
+		// extract frontmatter
+		matter = mdast.children.find((node) => node.type === 'yaml');
+
+		// mdast -> hast
+		hast = toHast(mdast);
+		hast = raw(hast);
+		if (hast) {
+			hast = normalizeHast(hast);
+		}
+		// re-convert to markdown
+		mdast2 = toMdast(hast);
+	})(spec);
+
+	// refine hast
+	$: {
+		hast2 = refineHast(hast, urlHash, showOnlySelected);
+	}
+
+	// render html
+	$: {
+		html = toHtml(hast2);
+	}
+
+	/**
+	 * @param {string} markdown
+	 * @returns {MdastRoot}
+	 */
+	function parseMarkdown(markdown) {
 		const options = { type: 'yaml', marker: { open: '-', close: '.' } };
-		mdast = fromMarkdown(spec, {
+		const mdast = fromMarkdown(spec, {
 			extensions: [frontmatter(options)],
 			mdastExtensions: [frontmatterFromMarkdown(options)]
 		});
 
-		// extract frontmatter
-		matter = mdast.children.find((node) => node.type === 'yaml');
-
-		// hast
-		hast = toHast(mdast);
-		console.log('🚀 ~ file: +page.svelte:63 ~ $: ~ hast:', hast);
-		if (hast) {
-			hast = normalizeHast(hast);
-		}
-	})(spec);
-
-	// re-convert to markdown
-	$: if (hast) {
-		mdast2 = toMdast(hast);
+		return mdast;
 	}
 
 	/**
@@ -80,6 +108,8 @@
 		hast = numberHeading(hast, {
 			exclude: ['Appendix: A parsing strategy']
 		});
+
+		numberExampleCodes(hast);
 
 		// inject slug & heading links
 		const slugify = rehypeSlug();
@@ -94,22 +124,36 @@
 		return hast;
 	}
 
-	$: {
-		let hast2 = hast;
-		// refine on selected
-		if (urlHash && showOnlySelected) {
-			const groupsAndParent = selectHeadingSectionElements(hast2, ([headingNode]) => {
-				return headingNode?.properties?.id === urlHash.slice(1);
-			});
-			if (groupsAndParent) {
-				const [groups, parent] = groupsAndParent;
-				parent.children = groups[0];
-			}
+	/**
+	 *
+	 * @param {HastNodes} hast
+	 * @param {string} urlHash
+	 * @param {boolean} showOnlySelected
+	 * @returns {HastNodes}
+	 */
+	function refineHast(hast, urlHash, showOnlySelected) {
+		console.log('refineHast', hast, { urlHash, showOnlySelected });
+		if (!(urlHash && showOnlySelected)) return hast;
+
+		const hast2 = structuredClone(hast);
+		// select id matching url hash string
+		const groupsAndParent = selectHeadingSectionElements(hast2, ([headingNode]) => {
+			return headingNode?.properties?.id === urlHash.slice(1);
+		});
+		if (groupsAndParent) {
+			const [groups, parent] = groupsAndParent;
+			parent.children = groups[0];
 		}
 
-		// export to html
-		html = toHtml(hast2);
+		console.log('🚀 ~ file: +page.svelte:129 ~ refineHast ~ hast2:', hast2);
+		return hast2;
 	}
+
+	onMount(() => {
+		if (urlHash) {
+			hast2 = refineHast(hast, urlHash, showOnlySelected);
+		}
+	});
 </script>
 
 <main style:--sidebar-width={sidebarWidth + 'px'}>
@@ -197,16 +241,6 @@
 		padding: 10px;
 		min-height: 0;
 		overflow: auto;
-	}
-	article :is(h1, h2, h3, h4, h5, h6) {
-		margin: 0;
-	}
-	article :global(:is(code)) {
-		font-family: monospace;
-		background-color: #d3e1e4;
-	}
-	article :global(:is(pre > code)) {
-		background-color: transparent;
 	}
 
 	aside {
