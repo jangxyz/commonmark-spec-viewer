@@ -11,25 +11,25 @@
 	import rehypeSlug from 'rehype-slug';
 	import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
-	import numberHeading from './hast_util_number_heading';
-	import selectHeadingSectionElements from './hast_select_heading_section_elements';
+	import numberHeading from '../../lib/hast/hast_util_number_heading';
+	import selectHeadingSectionElements from '../../lib/hast/hast_select_heading_section_elements';
 	import Toc from './Toc.svelte';
 	import Header from './Header.svelte';
-	import injectHorizontalRule from './hast_inject_horizontal_rule';
+	import injectHorizontalRule from '../../lib/hast/hast_inject_horizontal_rule';
 
 	$: urlHash = $page.url.hash;
 
 	/**
-	 * @typedef {import('./types').HastNodes} HastNodes
+	 * @typedef {import('../../lib/types').HastNodes} HastNodes
 	 */
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 	$: ({ spec } = data);
 
-	/** @type {import('./types').MdastRoot} */
+	/** @type {import('../../lib/types').MdastRoot} */
 	let mdast;
-	/** @type {import('./types').MdastNode} */
+	/** @type {import('../../lib/types').MdastNode} */
 	let mdast2;
 	let matter;
 

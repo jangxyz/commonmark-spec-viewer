@@ -4,7 +4,7 @@ import { heading } from 'hast-util-heading';
 import { headingRank } from 'hast-util-heading-rank';
 import type { Root as HastRoot, Content as HastContent } from 'hast';
 import type { Parent } from 'unist';
-import type { HastElement, HastParent } from './types';
+import type { HastElement, HastParent } from '../types';
 
 type HastNodes = HastRoot | HastContent;
 

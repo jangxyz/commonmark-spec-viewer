@@ -3,7 +3,7 @@
 	import { toHtml } from 'hast-util-to-html';
 	import { toc } from 'mdast-util-toc';
 	import type { Result } from 'mdast-util-toc';
-	import type { MdastNode } from './types';
+	import type { MdastNode } from '../../lib/types';
 
 	export let mdast: MdastNode;
 
