@@ -13,6 +13,21 @@ pre > code {
   background-color: transparent;
 }
 
+:is(h1,h2,h3,h4,h5,h6) .icon.icon-link:before {
+  content: "#";
+  /*color: lightgray;*/
+  opacity: 0;
+  font-size: 85%;
+  display: inline-block;
+  margin-left: 4px;
+}
+:is(h1,h2,h3,h4,h5,h6):hover .icon.icon-link:before {
+  opacity: 0.3;
+  text-decoration: underline;
+}
+
+/* example-code */
+
 figure.example-code figcaption {
   position: relative;
 }

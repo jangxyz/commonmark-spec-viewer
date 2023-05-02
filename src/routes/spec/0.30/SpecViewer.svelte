@@ -127,7 +127,6 @@
 	 * @returns {HastNodes}
 	 */
 	function refineHast(hast, urlHash, showOnlySelected) {
-		//console.log('refineHast', hast, { urlHash, showOnlySelected });
 		if (!(urlHash && showOnlySelected)) return hast;
 
 		const hast2 = structuredClone(hast);
@@ -139,8 +138,10 @@
 			const [groups, parent] = groupsAndParent;
 			parent.children = groups[0];
 		}
+		// has url hash, but no heading found.
+		else {
+		}
 
-		//console.log('🚀 ~ file: +page.svelte:129 ~ refineHast ~ hast2:', hast2);
 		return hast2;
 	}
 
