@@ -1,0 +1,42 @@
+<script>
+	export let showToc = true;
+	export let showOnlySelected = false;
+</script>
+
+<div class="header">
+	<div class="left">
+		<span class="title">CommonMark Spec</span>
+	</div>
+	<div class="right">
+		<label>
+			<input type="checkbox" bind:checked={showToc} /> ToC
+		</label>
+		<label>
+			<input type="checkbox" bind:checked={showOnlySelected} /> Show only selected
+		</label>
+	</div>
+</div>
+
+<style>
+	.header {
+		height: 30px;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+
+		border-bottom: 1px solid black;
+	}
+	.header > * {
+		margin: 0 8px;
+	}
+
+	.title {
+		font-weight: bold;
+	}
+
+	label {
+		user-select: none;
+		cursor: pointer;
+	}
+</style>
