@@ -4,7 +4,6 @@ import { headingRank } from 'hast-util-heading-rank';
 import { select } from 'unist-util-select';
 import { toString } from 'hast-util-to-string';
 import type { Root as HastRoot, Content as HastContent, Text as HastText } from 'hast';
-//import { is } from 'unist-util-is';
 
 type HastNodes = HastRoot | HastContent;
 

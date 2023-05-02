@@ -12,7 +12,7 @@
 			<input type="checkbox" bind:checked={showToc} /> ToC
 		</label>
 		<label>
-			<input type="checkbox" bind:checked={showOnlySelected} /> Show only selected
+			<input type="checkbox" bind:checked={showOnlySelected} /> Only selected
 		</label>
 	</div>
 </div>
@@ -36,6 +36,7 @@
 	}
 
 	label {
+		margin: 0 4px;
 		user-select: none;
 		cursor: pointer;
 	}

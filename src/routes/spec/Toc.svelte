@@ -11,7 +11,6 @@
 
 	$: {
 		const table = toc(mdast);
-		console.log('🚀 ~ file: Toc.svelte:14 ~ table:', table);
 		let hast = toHast(table.map);
 		html = toHtml(hast);
 	}

@@ -1,4 +1,6 @@
 <script>
+	import { page } from '$app/stores';
+
 	import { fromMarkdown } from 'mdast-util-from-markdown';
 	import { toHast } from 'mdast-util-to-hast';
 	import { toHtml } from 'hast-util-to-html';
@@ -10,8 +12,11 @@
 	import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 	import numberHeading from './hast_util_number_heading';
+	import selectHeadingSectionElements from './hast_select_heading_section_elements';
 	import Toc from './Toc.svelte';
 	import Header from './Header.svelte';
+
+	$: urlHash = $page.url.hash;
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -35,6 +40,7 @@
 	$: sidebarWidth = showToc ? 200 : 0;
 	let showOnlySelected = false;
 
+	// render markdown
 	$: (async (spec) => {
 		// mdast
 		const options = { type: 'yaml', marker: { open: '-', close: '.' } };
@@ -42,7 +48,8 @@
 			extensions: [frontmatter(options)],
 			mdastExtensions: [frontmatterFromMarkdown(options)]
 		});
-		// frontmatter
+
+		// extract frontmatter
 		matter = mdast.children.find((node) => node.type === 'yaml');
 		if (!matter) return;
 
@@ -52,28 +59,55 @@
 			exclude: ['Appendix: A parsing strategy']
 		});
 
-		const slugify = rehypeSlug();
-		if (slugify) {
-			slugify(hast);
-		}
-
-		const autolinkHeadings = rehypeAutolinkHeadings({ behavior: 'append' });
-		if (autolinkHeadings) {
-			autolinkHeadings(hast);
-		}
-
 		if (hast) {
+			// inject slug & heading links
+			const slugify = rehypeSlug();
+			if (slugify) {
+				slugify(hast);
+			}
+			const autolinkHeadings = rehypeAutolinkHeadings({ behavior: 'append' });
+			if (autolinkHeadings) {
+				autolinkHeadings(hast);
+			}
+
+			// re-convert to markdown
 			mdast2 = toMdast(hast);
-			html = toHtml(hast);
-			//console.log('🚀 ~ file: +page.svelte:58:', { mdast, hast, html });
 		}
 	})(spec);
+
+	$: {
+		let hast2 = hast;
+		if (urlHash && showOnlySelected) {
+			// refine on selected
+			if (urlHash && showOnlySelected) {
+				console.log('🚀 ~ file: +page.svelte:80 ~ $: ~ urlHash:', urlHash);
+				let groupsAndParent = selectHeadingSectionElements(hast2, ([headingNode]) => {
+					return headingNode?.properties?.id === urlHash.slice(1);
+				});
+				console.log('🚀 ~ file: +page.svelte:79 ~ $: ~ groups:', groupsAndParent, {
+					all: selectHeadingSectionElements(hast2)
+				});
+				if (groupsAndParent) {
+					const [groups, parent] = groupsAndParent;
+					parent.children = groups[0];
+				}
+			}
+		}
+		// export to html
+		html = toHtml(hast2);
+	}
 </script>
 
 <main style:--sidebar-width={sidebarWidth + 'px'}>
 	<header>
 		<Header bind:showToc bind:showOnlySelected />
 	</header>
+
+	{#if showToc}
+		<aside>
+			<Toc mdast={mdast2} />
+		</aside>
+	{/if}
 
 	<article>
 		<details>
@@ -83,6 +117,7 @@
 				{#if matter}
 					<pre><code>{matter.value}</code></pre>
 				{/if}
+
 				<p>
 					Estimated reading time: {readingTime(hast).toFixed(1)} minutes.
 				</p>
@@ -93,12 +128,6 @@
 
 		{@html html}
 	</article>
-
-	{#if showToc}
-		<aside>
-			<Toc mdast={mdast2} />
-		</aside>
-	{/if}
 
 	<footer>
 		<!--  -->
@@ -118,10 +147,10 @@
 	main {
 		height: 100%;
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) var(--sidebar-width);
+		grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
 		grid-template-areas:
 			'header header'
-			'article aside'
+			'aside article'
 			'footer footer';
 	}
 	header {
@@ -163,7 +192,7 @@
 	aside {
 		min-height: 0;
 		overflow: auto;
-		border-left: 1px solid black;
+		border-right: 1px solid black;
 		font-size: 85%;
 	}
 </style>
