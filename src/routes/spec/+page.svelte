@@ -15,8 +15,13 @@
 	import selectHeadingSectionElements from './hast_select_heading_section_elements';
 	import Toc from './Toc.svelte';
 	import Header from './Header.svelte';
+	import injectHorizontalRule from './hast_inject_horizontal_rule';
 
 	$: urlHash = $page.url.hash;
+
+	/**
+	 * @typedef {import('./types').HastNodes} HastNodes
+	 */
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -28,7 +33,7 @@
 	let mdast2;
 	let matter;
 
-	/** @type {import('./types').HastNodes} */
+	/** @type {HastNodes} */
 	let hast;
 
 	/** @type {string} */
@@ -51,48 +56,57 @@
 
 		// extract frontmatter
 		matter = mdast.children.find((node) => node.type === 'yaml');
-		if (!matter) return;
 
 		// hast
 		hast = toHast(mdast);
+		console.log('🚀 ~ file: +page.svelte:63 ~ $: ~ hast:', hast);
+		if (hast) {
+			hast = normalizeHast(hast);
+		}
+	})(spec);
+
+	// re-convert to markdown
+	$: if (hast) {
+		mdast2 = toMdast(hast);
+	}
+
+	/**
+	 * @param {HastNodes} hast
+	 * @returns {HastNodes}
+	 */
+	function normalizeHast(hast) {
+		injectHorizontalRule(hast);
+
 		hast = numberHeading(hast, {
 			exclude: ['Appendix: A parsing strategy']
 		});
 
-		if (hast) {
-			// inject slug & heading links
-			const slugify = rehypeSlug();
-			if (slugify) {
-				slugify(hast);
-			}
-			const autolinkHeadings = rehypeAutolinkHeadings({ behavior: 'append' });
-			if (autolinkHeadings) {
-				autolinkHeadings(hast);
-			}
-
-			// re-convert to markdown
-			mdast2 = toMdast(hast);
+		// inject slug & heading links
+		const slugify = rehypeSlug();
+		if (slugify) {
+			slugify(hast);
 		}
-	})(spec);
+		const autolinkHeadings = rehypeAutolinkHeadings({ behavior: 'append' });
+		if (autolinkHeadings) {
+			autolinkHeadings(hast);
+		}
+
+		return hast;
+	}
 
 	$: {
 		let hast2 = hast;
+		// refine on selected
 		if (urlHash && showOnlySelected) {
-			// refine on selected
-			if (urlHash && showOnlySelected) {
-				console.log('🚀 ~ file: +page.svelte:80 ~ $: ~ urlHash:', urlHash);
-				let groupsAndParent = selectHeadingSectionElements(hast2, ([headingNode]) => {
-					return headingNode?.properties?.id === urlHash.slice(1);
-				});
-				console.log('🚀 ~ file: +page.svelte:79 ~ $: ~ groups:', groupsAndParent, {
-					all: selectHeadingSectionElements(hast2)
-				});
-				if (groupsAndParent) {
-					const [groups, parent] = groupsAndParent;
-					parent.children = groups[0];
-				}
+			const groupsAndParent = selectHeadingSectionElements(hast2, ([headingNode]) => {
+				return headingNode?.properties?.id === urlHash.slice(1);
+			});
+			if (groupsAndParent) {
+				const [groups, parent] = groupsAndParent;
+				parent.children = groups[0];
 			}
 		}
+
 		// export to html
 		html = toHtml(hast2);
 	}
@@ -189,6 +203,14 @@
 	article :is(h1, h2, h3, h4, h5, h6) {
 		margin: 0;
 	}
+	article :global(:is(code)) {
+		font-family: monospace;
+		background-color: #d3e1e4;
+	}
+	article :global(:is(pre > code)) {
+		background-color: transparent;
+	}
+
 	aside {
 		min-height: 0;
 		overflow: auto;

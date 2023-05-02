@@ -22,6 +22,7 @@
 
 <style>
 	div {
+		margin: 10px 0;
 		overflow-x: hidden;
 	}
 	div :global(ul) {
@@ -35,5 +36,8 @@
 	}
 	div :global(li > p) {
 		margin: 1em 0 0.5em;
+	}
+	div :global(li li > p) {
+		margin: 0;
 	}
 </style>

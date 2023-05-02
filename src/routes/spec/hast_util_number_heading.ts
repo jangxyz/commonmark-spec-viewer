@@ -81,7 +81,8 @@ export default function numberHeading(
 
 			const textNode = select('text', node) as HastText;
 			//console.log(rank, textNode, { node, number, numbers, numbersSoFar: structuredClone(numbersSoFar) });
-			textNode.value = `${numbers.join('.')}. ${textNode.value}`;
+			const prefix = numbers.join('.');
+			textNode.value = `${prefix} ${textNode.value}`;
 		}
 
 		//
