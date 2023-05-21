@@ -6,9 +6,9 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta http-equiv="content-security-policy" content="">
 		<link href="../../_app/immutable/assets/0.d7cc313c.css" rel="stylesheet">
-		<link href="../../_app/immutable/assets/6.6dd56332.css" rel="stylesheet">
+		<link href="../../_app/immutable/assets/6.007e7046.css" rel="stylesheet">
 		<link href="../../_app/immutable/assets/TocWithPageLink.95cc3c43.css" rel="stylesheet">
-		<link href="../../_app/immutable/assets/index.d5813127.css" rel="stylesheet"><!-- HEAD_svelte-jzgs4p_START --><script type="text/javascript">// make toggle sidebar work on `csr = false`
+		<link href="../../_app/immutable/assets/index.73536a64.css" rel="stylesheet"><!-- HEAD_svelte-1rh24oo_START --><script type="text/javascript">// make toggle sidebar work on `csr = false`
 		document.addEventListener('DOMContentLoaded', function () {
 			const showTocCheckbox = document.querySelector('input[name="show-toc"]');
 			const specViewerEl = document.querySelector('.spec-viewer');
@@ -28,7 +28,25 @@
 				});
 			}
 		});
-	</script><!-- HEAD_svelte-jzgs4p_END -->
+	</script><script type="text/javascript">// observe headings and highlight
+		document.addEventListener('DOMContentLoaded', function () {
+			const observer = new IntersectionObserver(function observeLastVisibleEntry(entries) {
+				const visibleEntries = entries.filter(({ intersectionRatio }) => intersectionRatio !== 0);
+				const lastEntry = visibleEntries.slice(1).reduce((lowestEntrySoFar, entry) => {
+					if (entry.boundingClientRect.bottom > lowestEntrySoFar.boundingClientRect.bottom) {
+						lowestEntrySoFar = entry;
+					}
+					return lowestEntrySoFar;
+				}, visibleEntries[0]);
+				if (!lastEntry) return;
+				currentHeadingId = lastEntry.target.getAttribute('id');
+			});
+			const headingEls = articleContentsRef.querySelectorAll('article :is(h1,h2,h3,h4,h5,h6');
+			[...headingEls].forEach((el) => {
+				observer.observe(el);
+			});
+		});
+	</script><!-- HEAD_svelte-1rh24oo_END -->
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">
@@ -36,10 +54,10 @@
 
 
 
-<div class="spec-viewer svelte-54homp"><nav class="svelte-54homp"><div class="gnb-header svelte-y1nqfo"><div class="logo svelte-y1nqfo"><a href="/commonmark-spec-viewer/" class="svelte-y1nqfo">CommonMark Spec Viewer</a>
-		<details class="meta svelte-qdw5sg"><summary class="svelte-qdw5sg">Meta</summary>
+<div class="spec-viewer svelte-10tsrky"><nav class="svelte-10tsrky"><div class="gnb-header svelte-y1nqfo"><div class="logo svelte-y1nqfo"><a href="/commonmark-spec-viewer/" class="svelte-y1nqfo">CommonMark Spec Viewer</a>
+		<details class="spec-meta svelte-xcrhb3"><summary class="svelte-xcrhb3">Meta</summary>
 
-	<div class="meta"><pre><code>title: CommonMark Spec
+	<div class="meta svelte-xcrhb3"><pre><code>title: CommonMark Spec
 author: John MacFarlane
 version: '0.30'
 date: '2021-06-19'
@@ -56,7 +74,7 @@ license: '[CC-BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)'</code>
 		<div class="right svelte-y1nqfo"><a href="./single-page">View as single page</a></div></div>
 </div></nav>
 
-	<div class="sidebar svelte-54homp" style="display: none;"><div class="svelte-11vpjig"><!-- HTML_TAG_START --><ol>
+	<div class="sidebar svelte-10tsrky" style="display: none;"><div class="svelte-11vpjig"><!-- HTML_TAG_START --><ol>
 <li>
 <p><a href="./1-introduction">Introduction</a></p>
 <ol>
@@ -154,7 +172,7 @@ license: '[CC-BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)'</code>
 </div>
 	</div>
 
-	<main class="svelte-54homp"><div class="contents svelte-54homp"><div class="contents2 svelte-ira8jq"><header class="svelte-ira8jq"><nav class="breadcrumb svelte-84fdbx" aria-label="breadcrumb"><ul class="svelte-84fdbx"><li class="svelte-84fdbx"><a href="./toc" aria-current>Spec</a></li>
+	<main class="svelte-10tsrky"><div class="contents svelte-10tsrky"><div class="contents2 svelte-ira8jq"><header class="svelte-ira8jq"><nav class="breadcrumb svelte-84fdbx" aria-label="breadcrumb"><ul class="svelte-84fdbx"><li class="svelte-84fdbx"><a href="./toc" aria-current>Spec</a></li>
 		<li class="svelte-84fdbx"><a href="./1-introduction#introduction">1 Introduction</a></li>
 		<li class="svelte-84fdbx"><a href="#article" aria-current="page">1.2 Why is a spec needed?</a></li></ul>
 </nav>
@@ -246,7 +264,7 @@ pandoc).  To make matters worse, because nothing in Markdown counts
 as a "syntax error," the divergence often isn't discovered right away.</p><!-- HTML_TAG_END -->
 </article>
 
-					<aside class="right-sidebar svelte-ira8jq"><nav class="svelte-vht6rf"><!-- HTML_TAG_START --><ul><li><a href="#why-is-a-spec-needed">1.2 Why is a spec needed?</a></li></ul><!-- HTML_TAG_END -->
+					<aside class="right-sidebar svelte-ira8jq"><nav class="svelte-emiyuh"><!-- HTML_TAG_START --><ul><li><a href="#why-is-a-spec-needed">1.2 Why is a spec needed?</a></li></ul><!-- HTML_TAG_END -->
 </nav></aside></div>
 
 			<footer class="svelte-ira8jq"><nav data-sveltekit-reload class="svelte-1uzx3u4"><div>Prev: <a href="./1-1-what-is-markdown#what-is-markdown" class="svelte-1uzx3u4">1.1 What is Markdown?</a></div>
@@ -258,7 +276,7 @@ as a "syntax error," the divergence often isn't discovered right away.</p><!-- H
 </nav></footer></div>
 	</div></main>
 
-	<footer class="svelte-54homp">based on
+	<footer class="svelte-10tsrky">based on
 <a href="https://spec.commonmark.org/" target="_blank" rel="noreferrer noopener">https://spec.commonmark.org/</a>
 (try
 <a href="https://spec.commonmark.org/dingus/" target="_blank" rel="noreferrer noopener">dingus</a>)</footer>
